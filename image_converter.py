@@ -35,7 +35,7 @@ def convert_dir(directory, input, output):
         print(f'Converting contents of {f}!')
         convert_dir(f'{directory}/{f}', input, output)
 
-    files = [f for f in all if os.path.isfile(directory+'/'+f)] 
+    files = [f for f in all if os.path.isfile(directory+'/'+f) and re.search(f"\w+\{input}", f)] 
     
     if not files:
         return
@@ -52,10 +52,9 @@ def convert_dir(directory, input, output):
     
 
     for f in files:
-        if re.search(f"*{input}", f.upper()):
-            t = Thread(target=convert_img, args=(f, input, output, directory))
-            t.start()
-            threads.append(t)
+        t = Thread(target=convert_img, args=(f, input, output, directory))
+        t.start()
+        threads.append(t)
 
 
 if __name__ == "__main__":
@@ -74,7 +73,7 @@ if __name__ == "__main__":
     input = args.input if '.' in args.input else '.' + args.input
     input = input.upper()
     
-    if input not in supported:
+    if input.replace('.', '') not in supported:
         raise ValueError('Unsupported input file format!')
     
     output = (args.output).upper().replace('.', '')
